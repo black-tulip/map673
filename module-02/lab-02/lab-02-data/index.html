@@ -79,7 +79,13 @@
         .leaflet-popup-content {
             max-width: 160px;   
         }
-        
+        #ui-controls {   
+            margin-left: 10%;
+        }
+        #ui-controls label {
+            font-size: 1em;
+            margin-right: 5px;
+}
     </style>
 </head>
 
@@ -88,7 +94,16 @@
         <h1>Map Title</h1>
         <h2>Map Subtitle</h2>
     </header>
-
+    
+    <div id = 'ui-controls'>
+        <label>Choose a data attribute:</label>
+            <select id="occupied">
+                <option value="OWNED_MORT" selected>owned with a mortgage</option>
+                <option value="OWNED_FREE">owned free-and-clear</option> 
+                <option value="RENTER">rented</option>
+            </select>
+    </div>
+    
     <div id='map'></div>
 
     <footer>
@@ -127,6 +142,8 @@
             }).addTo(map);
             
             drawMap();
+            buildUI();
+            drawLegend();
               
         });
         
@@ -144,10 +161,11 @@
                 });
                 layer.bindPopup("<b>"+props["NAME"]+" County</b></br>" +
                                 attribute + ": " +
-                                ((props[attribute]/props[norm])*100).toLocaleString()+"%");  
+                                ((props[attribute]/props[norm])).toLocaleString('en-us', {
+                style: 'percent', maximumSignificantDigits: 4}));  
             });
+            updateLegend(breaks);
             
-            drawLegend(breaks);
         }
         
         function getClassBreaks() {
@@ -184,7 +202,7 @@
             }
         }
         
-        function drawLegend(breaks) {
+        function drawLegend() {
             
             var legend = L.control({position: 'topleft'});
 
@@ -192,25 +210,46 @@
                 
                 var div = L.DomUtil.create('div', 'legend');
                 
-                div.innerHTML = "<h3>" + attribute + " per " + norm + "</h3>"; 
+                
+                return div;
+                
+                    
+            };
+            
+            legend.addTo(map);
+            
+        }
+        
+        function buildUI(){
+            $('select[id="occupied"]').change(function() {
+                attribute = $(this).val();
+                
+                drawMap();
+                
+            });
+        }
+        function updateLegend(breaks) {
+            
+            var legend = $('.legend');
+            
+            legend.html("<h3>" + attribute + " per " + norm + "</h3>"); 
 
                 for (var i = 0; i < breaks.length; i++) {
             
                     var color = getColor(breaks[i][0], breaks);
                     
-                    div.innerHTML +=
+                    legend.append(
                         '<span style="background:' + color + '"></span> ' +
-                        '<label>'+(breaks[i][0]*100).toLocaleString() + ' &mdash; ' + 
-                        (breaks[i][1]*100).toLocaleString() + '</label>';
+                        '<label>'+(breaks[i][0]).toLocaleString('en-us', {
+                style: 'percent'}) + ' &mdash; ' + 
+                        (breaks[i][1]).toLocaleString('en-us', {
+                style: 'percent'}) + '</label>');
                 }
+            
                
-                return div;
-                
-                    
-            };
-
-            legend.addTo(map);
-        }
+            }
+            
+        
 
     </script>
     

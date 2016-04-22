@@ -85,7 +85,18 @@
         #ui-controls label {
             font-size: 1em;
             margin-right: 5px;
-}
+        }
+        .info {
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            text-align: right;   
+        }
+        .info h3 {
+            margin: 0;   
+        }
     </style>
 </head>
 
@@ -115,14 +126,24 @@
 
     <script>
         
+        var labels = {
+                "OCCUPIED": "occupied units",
+                "OWNED_MORT": "% occupied housing units owned with mortgage",
+                "OWNED_FREE": "% occupied housing units owned free and clear",
+                "RENTER": "% occupied housing units rented"   
+            
+        }
+        
         var options = {
             center: [37.8, -85.8],
             zoom: 7.4,
+            zoomControl: false,
+            dragging: false,
             zoomControl: false
         }
         var map = L.map('map', options);
         
-        map.addControl( L.control.zoom({ position: 'topright' }));
+//        map.addControl( L.control.zoom({ position: 'topright' }));
         
         var dataLayer,
             attribute = "OWNED_MORT",
@@ -141,9 +162,11 @@
                 }          
             }).addTo(map);
             
+            drawLegend();
             drawMap();
             buildUI();
-            drawLegend();
+            drawInfo();
+           
               
         });
         
@@ -160,9 +183,14 @@
                                         props[norm], breaks)
                 });
                 layer.bindPopup("<b>"+props["NAME"]+" County</b></br>" +
-                                attribute + ": " +
+                                labels[attribute] + ": " +
                                 ((props[attribute]/props[norm])).toLocaleString('en-us', {
                 style: 'percent', maximumSignificantDigits: 4}));  
+                layer.on('mouseover', function(){
+                    layer.setStyle( { strokeColor: 'yellow' } );
+                    updateInfo(this);
+                    
+                });
             });
             updateLegend(breaks);
             
@@ -205,6 +233,7 @@
         function drawLegend() {
             
             var legend = L.control({position: 'topleft'});
+            
 
             legend.onAdd = function () {
                 
@@ -230,9 +259,8 @@
         }
         function updateLegend(breaks) {
             
-            var legend = $('.legend');
-            
-            legend.html("<h3>" + attribute + " per " + norm + "</h3>"); 
+            var legend = $('.legend').html("<h3>" + labels[attribute] + "</h3><ul>");
+                        
 
                 for (var i = 0; i < breaks.length; i++) {
             
@@ -248,6 +276,37 @@
             
                
             }
+        function drawInfo() {
+            
+            var info = L.control({position: 'topright'});
+            
+                info.onAdd = function(map) {
+                
+                    var div = L.DomUtil.create('div', 'info');
+
+                    return div;
+            }
+            info.addTo(map);
+            $(".info").hide();
+            dataLayer.on('mouseover', function() {
+                $(".info").show();
+            });
+            dataLayer.on('mouseout', function() {
+                $(".info").hide();    
+            });
+        }
+        
+        function updateInfo(layer) {
+            
+            var props = layer.feature.properties;
+            
+            var html = "<h3>"+props['NAME']+" County</h3>"+
+                "total # occupied units: <b>"+ props['OCCUPIED']+"</b><br>"+
+                "# owned with mortgage or loan: <b>"+ props["OWNED_MORT"]+"</b><br>"+
+                "# owned free and clear: <b>"+ props["OWNED_FREE"]+"</b><br>"+
+                "# occupied by renters: <b>"+ props["RENTER"]+"</b>"
+            $(".info").html(html);
+        }
             
         
 

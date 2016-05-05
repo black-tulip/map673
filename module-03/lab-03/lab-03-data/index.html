@@ -248,7 +248,7 @@
                          
                 
             }); 
-           //class breaks: 7 (maximum recommended for choropleth).
+           //class breaks: 7 (maximum recommended for choropleth)
             var breaks = ss.quantile(values, [0, 0.143, 0.265, 0.428, 0.57, 0.71, 0.86, 1]);
 
             return breaks;
@@ -272,7 +272,10 @@
             } else if(d <= breaks[7]) {
                 return '#990000'
             }
-                    
+            
+            
+        }
+        
         
         // function to draw the legend
         
@@ -313,7 +316,6 @@
    
         function createSlider() {
             
-            //decided to place it below the legend so data is all in a single location.
             var sliderControl = L.control({ position: 'topright'});
             
             sliderControl.onAdd = function(map) {

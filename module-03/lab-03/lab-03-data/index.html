@@ -26,16 +26,17 @@
             padding: 6px 10%;
         }
         h1 {
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
             position: absolute;
             z-index: 100;
             top: 10px;
             left: 60px;
             padding: 8px 15px;
             margin: 0;
-            color: whitesmoke;
-            font-size: 1.5em;
-            background: rgba(25,25,25,0.8);
-            border-radius: 5px; 
+            color: slategrey;
+            font-size: 2.5em;
         }
         #map {
             position: absolute;
@@ -53,17 +54,19 @@
         }  
         .legend {
             padding: 8px 8px;
-            font-size: 1em;
+            font-size: 1.1em;
             background: rgba(255,255,255,0.8);
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             border-radius: 5px;
-            width: 160px;
+            width: 180px;
         }
         .legend h3 {
-            font-size: 1.1em;
+            font-size: 1.5em;
             font-weight: bold;
             color: #001323;
+            text-align: center;
             margin: 0;
+            color: slategrey;
         }
         .legend span {
             width: 20px;
@@ -80,35 +83,49 @@
             height: 22px
         }
         #ui-controls {
-            width: 176px;
-            padding: 8px 25px 8px 15px;
-            background: rgba(25,25,25,0.8);
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(255,255,255,0.8);
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             border-radius: 5px;
-            color: whitesmoke;
-            z-index: 100;
+            text-align: center;
+            width: 180px;
+            color: slategrey;
         }
         .year-slider {
-            width: 100%
+            width: 160px;
+        }
+         .info {
+            padding: 6px 8px;
+            font-size: 1.3em;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            text-align: center;
+            width: 180px;
+            color: slategrey;
+        }
+        .info h3 {
+            margin: 0;   
         }
         
     </style>
 </head>
 
 <body>
-    <h1>USA Unemployment Rates 2001-2013</h1>
+    <h1>Kentucky Unemployment Rates: 2000 - 2013</h1>
     <div id='map'></div>
     <div id='ui-controls'>
-        <input type='range' min='2001' max='2013', value='2001', step='1' class='year-slider'></div>
+        <input type='range' min='2000' max='2013', value='2000', step='1' class='year-slider'></div>
     <script>
         
          // instantiate the Leaflet map
         var options = {
-            center: [38.2, -94],
-            zoom: 5,
-            minZoom: 4,
-            maxZoom: 6,
-            dragging: true,
+            center: [37.7, -85.8],
+            zoom: 8,
+            minZoom: 7,
+            maxZoom: 9,
+            dragging: false,
             zoomControl: true
         }
         
@@ -119,26 +136,28 @@
         
          // load map tiles and add to map
         
-         var tiles = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-        });  
+         var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+	subdomains: 'abcd',
+	maxZoom: 19
+});
             
             tiles.addTo(map);
                 
         // declare global variables
         
         var dataLayer,
-            attribute = '2001' ;
+            attribute = '2000' ;
         
         // AJAX requests to load data files
-        $.getJSON("us-states.json", function(states) {
-                Papa.parse('states-unemployment.csv', {
+        $.getJSON("ky-counties.json", function(counties) {
+                Papa.parse('ky-unemployment-data.csv', {
 
                     download: true,
                     header: true,
                     complete: function(data) {
 
-                        processData(states, data);
+                        processData(counties, data);
 
                     }
                 });
@@ -150,42 +169,41 @@
             });
         
         // function to process/bind data
-        function processData(states, data) {
-                for(var state in states.features) {
-                    var props = states.features[state].properties;
+        function processData(counties, data) {
+                for(var county in counties.features) {
+                    var props = counties.features[county].properties;
                     
                     for(var d in data.data) {
-                        if(props.STATEFP == data.data[d].STATE_FIP) {
-                            states.features[state].properties = data.data[d];
+                        if(props.COUNTY_FIP == data.data[d].CNTY) {
+                            counties.features[county].properties = data.data[d];
                             break;
                         }
                     }
                 }
             drawLegend()
-            drawMap(states);
+            drawMap(counties);
             createSlider();
-            
+            drawInfo();
         }
         // function to draw the map
         
-        function drawMap(states) {
+        function drawMap(counties) {
             
-            dataLayer = L.geoJson(states, {
+            dataLayer = L.geoJson(counties, {
                 
                 style: function(feature) {
                     return {
-                        color: 'white',
-                        weight: 1,
-                        fillOpacity: .6,
-                        fillColor: '#0A79B6'
+                        color: 'black',
+                        weight: .5,
+                        fillOpacity: .7,
                         
                     }
                 }
-            }).addTo(map);
             
+            }).addTo(map);            
             updateMap()
         }
-        // function to update the map
+        // function to update the map with new colors.
         
         function updateMap() {
             
@@ -195,6 +213,21 @@
                 layer.setStyle( {
                     fillColor: getColor(Number(layer.feature.properties[attribute]), breaks)
                 })
+                
+                //add mouse-over functionality
+                layer.on('mouseover', function(){
+                    layer.setStyle( { 
+                        weight: 3, 
+                        color: 'black', 
+                        fillOpacity: .75,
+                        } );
+                    layer.bringToFront();
+                    updateInfo(this);
+                    
+                });
+                layer.on('mouseout', function() {
+                layer.setStyle( { weight: .5, color: 'black', fillOpacity: .7 }             );  
+                }); 
             });
             updateLegend(breaks);
         }
@@ -207,12 +240,16 @@
             dataLayer.eachLayer(function(layer) {
                 
                 var value = Number(layer.feature.properties[attribute]);
-                values.push(value);   
+                values.push(value);
+                
+                //create popup
+                layer.bindPopup("<b>" + layer.feature.properties["NAME"] + " County</b><br>" + value + "% Unemployment");
+                
+                         
+                
             }); 
-            console.log(values);
-           
-            var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
-            console.log(breaks);
+           //class breaks: 7 (maximum recommended for choropleth).
+            var breaks = ss.quantile(values, [0, 0.143, 0.265, 0.428, 0.57, 0.71, 0.86, 1]);
 
             return breaks;
         }
@@ -221,20 +258,21 @@
         
         function getColor(d, breaks) {
             if(d <= breaks[1]) {
-                return '#f1eef6';
+                return '#fef0d9';
             } else if(d <= breaks[2]) {
-                return '#bdc9e1';
+                return '#fdd49e';
             } else if(d <= breaks[3]) {
-                return '#74a9cf';
+                return '#fdbb84';
             } else if(d <= breaks[4]) {
-                return '#2b8cbe'
+                return '#fc8d59'
             } else if(d <= breaks[5]) {
-                return '#045a8d'
+                return '#ef6548'
+            } else if(d <= breaks[6]) {
+                return '#d7301f'
+            } else if(d <= breaks[7]) {
+                return '#990000'
             }
-            
-            
-        }
-        
+                    
         
         // function to draw the legend
         
@@ -275,7 +313,8 @@
    
         function createSlider() {
             
-            var sliderControl = L.control({ position: 'bottomleft'});
+            //decided to place it below the legend so data is all in a single location.
+            var sliderControl = L.control({ position: 'topright'});
             
             sliderControl.onAdd = function(map) {
                 
@@ -295,6 +334,52 @@
                 attribute = ($(this).val());
                 updateMap();
             })
+        }
+        
+        //function to create info box
+        function drawInfo() {
+            
+            var info = L.control({position: 'topright'});
+            
+                info.onAdd = function(map) {
+                
+                    var div = L.DomUtil.create('div', 'info');
+
+                    return div;
+            }
+            info.addTo(map);
+            $(".info").hide();
+            dataLayer.on('mouseover', function() {
+                $(".info").show();
+                
+            });
+            dataLayer.on('mouseout', function() {
+                
+                $(".info").hide();    
+            });
+        }
+        
+        //populates the info box with data from the corresponding polygon
+        function updateInfo(layer) {
+            
+            var props = layer.feature.properties;
+            
+            var html = "<h3>"+props['NAME']+" County</h3>"+
+                "2000: <b>"+ props['2000']+"%</b><br>"+
+                "2001: <b>"+ props["2001"]+"%</b><br>"+
+                "2002: <b>"+ props["2002"]+"%</b><br>"+
+                "2003: <b>"+ props["2003"]+"%</b><br>"+
+                "2004: <b>"+ props["2004"]+"%</b><br>"+
+                "2005: <b>"+ props["2005"]+"%</b><br>"+
+                "2006: <b>"+ props["2006"]+"%</b><br>"+
+                "2007: <b>"+ props["2007"]+"%</b><br>"+
+                "2008: <b>"+ props["2008"]+"%</b><br>"+
+                "2009: <b>"+ props["2009"]+"%</b><br>"+
+                "2010: <b>"+ props["2010"]+"%</b><br>"+
+                "2011: <b>"+ props["2011"]+"%</b><br>"+
+                "2012: <b>"+ props["2012"]+"%</b><br>"+
+                "2013: <b>"+ props["2013"]+"%</b>"
+            $(".info").html(html);
         }
     </script>
     

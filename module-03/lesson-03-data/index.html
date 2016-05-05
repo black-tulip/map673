@@ -69,6 +69,9 @@
             dragging: true,
             zoomControl: true
         }
+        
+        
+        
         var map = L.map('map', options);
         
         
@@ -95,7 +98,8 @@
                 
         // declare global variables
         
-        
+        var dataLayer,
+            attribute = '2001' ;
         
         // AJAX requests to load data files
         $.getJSON("us-states.json", function(states) {
@@ -113,7 +117,7 @@
             })
             .fail(function() {
                 // the data file failed to load
-                console.log("Ruh roh! An error has occurred." );
+                console.log("HOLD YOUR HORSES!!! DATA LOAD FAILURE!!!" );
             });
         
         // function to process/bind data
@@ -128,10 +132,11 @@
                         }
                     }
                 }
-            console.log(states);
             drawMap(states);
+            drawLegend();
         }
         // function to draw the map
+        
         function drawMap(states) {
             
             dataLayer = L.geoJson(states, {
@@ -140,21 +145,86 @@
                     return {
                         color: 'whitesmoke',
                         weight: 1,
-                        fillOpacity: .3,
+                        fillOpacity: 1,
                         fillColor: '#0A79B6'
                         
                     }
                 }
             }).addTo(map);
             
+            updateMap()
         }
         // function to update the map
         
+        function updateMap() {
+            
+            var breaks = getClassBreaks();
+            
+            dataLayer.eachLayer(function(layer) {
+                layer.setStyle( {
+                    fillColor: getColor(Number(layer.feature.properties[attribute]), breaks)
+                })
+            });
+        }
+        
         // function get the class breaks   
         
-        // function to get the color value
+        function getClassBreaks() {
+            var values = [];
+            
+            dataLayer.eachLayer(function(layer) {
                 
+                var value = Number(layer.feature.properties[attribute]);
+                values.push(value);   
+            }); 
+            console.log(values);
+           
+            var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+            console.log(breaks);
+
+            return breaks;
+        }
+        
+        // function to get the color value
+        
+        function getColor(d, breaks) {
+            if(d <= breaks[1]) {
+                return '#f1eef6';
+            } else if(d <= breaks[2]) {
+                return '#bdc9e1';
+            } else if(d <= breaks[3]) {
+                return '#74a9cf';
+            } else if(d <= breaks[4]) {
+                return '#2b8cbe'
+            } else if(d <= breaks[5]) {
+                return '#045a8d'
+            }
+            
+            
+        }
+        
+        
         // function to draw the legend
+        
+        function drawLegend() {
+            
+            var legend = L.control({position: 'topright'});
+            
+
+            legend.onAdd = function () {
+                
+                var div = L.DomUtil.create('div', 'legend');
+                
+                
+                return div;
+                
+                    
+            };
+            
+            legend.addTo(map);
+            
+        }
+        
         
         // function to update the legend
 

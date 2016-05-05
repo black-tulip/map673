@@ -50,14 +50,56 @@
         p {
             font-size: 1em;
             color: #001323;
-        }   
+        }  
+        .legend {
+            padding: 8px 8px;
+            font-size: 1em;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            width: 160px;
+        }
+        .legend h3 {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #001323;
+            margin: 0;
+        }
+        .legend span {
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin: 0 10px 10px 0;
+        }
+        .legend ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 5px 20px 0;
+        }
+        .legend li {
+            height: 22px
+        }
+        #ui-controls {
+            width: 176px;
+            padding: 8px 25px 8px 15px;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            color: whitesmoke;
+            z-index: 100;
+        }
+        .year-slider {
+            width: 100%
+        }
+        
     </style>
 </head>
 
 <body>
     <h1>Map Title Goes Here</h1>
     <div id='map'></div>
-    
+    <div id='ui-controls'>
+        <input type='range' min='2001' max='2013', value='2001', step='1' class='year-slider'></div>
     <script>
         
          // instantiate the Leaflet map
@@ -82,19 +124,6 @@
         });  
             
             tiles.addTo(map);
-        
-        var Stamen_TonerLines = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-lines/{z}/{x}/{y}.{ext}', {
-                attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                subdomains: 'abcd',
-                minZoom: 0,
-                maxZoom: 20,
-                ext: 'png'
-            });
-            Stamen_TonerLines.addTo(map);
-        
-        
-        
-       
                 
         // declare global variables
         
@@ -132,8 +161,10 @@
                         }
                     }
                 }
+            drawLegend()
             drawMap(states);
-            drawLegend();
+            createSlider();
+            
         }
         // function to draw the map
         
@@ -143,9 +174,9 @@
                 
                 style: function(feature) {
                     return {
-                        color: 'whitesmoke',
+                        color: 'white',
                         weight: 1,
-                        fillOpacity: 1,
+                        fillOpacity: .6,
                         fillColor: '#0A79B6'
                         
                     }
@@ -165,6 +196,7 @@
                     fillColor: getColor(Number(layer.feature.properties[attribute]), breaks)
                 })
             });
+            updateLegend(breaks);
         }
         
         // function get the class breaks   
@@ -206,16 +238,11 @@
         
         // function to draw the legend
         
-        function drawLegend() {
+        function drawLegend(breaks) {
             
             var legend = L.control({position: 'topright'});
-            
-
             legend.onAdd = function () {
-                
                 var div = L.DomUtil.create('div', 'legend');
-                
-                
                 return div;
                 
                     
@@ -227,9 +254,43 @@
         
         
         // function to update the legend
+        function updateLegend(breaks) {
+            
+            var legend = $('.legend').html("<h3> % Unemployment: " + attribute + "</h3><ul>");
+                        
 
+                for (var i = 0; i < breaks.length-1; i++) {
+            
+                    var color = getColor(breaks[i + 1], breaks);
+                    
+                    $('.legend ul').append('<br><span style="background:' + color + '"></span> ' +
+                        breaks[i] + '%' +' &mdash; ' +
+                        breaks[i + 1] + '%' + '<br>');
+                }
+            legend.append("</ul>");
+            
+               
+            }
         // function to create the range slider
-
+   
+        function createSlider() {
+            
+            var sliderControl = L.control({ position: 'bottomleft'});
+            
+            sliderControl.onAdd = function(map) {
+                
+                var slider = L.DomUtil.get('ui-controls');
+                
+                L.DomEvent.addListener(slider, 'mousedown', function(e){
+                    L.DomEvent.stopPropagation(e);
+                });
+                
+                return slider
+                
+            }
+            
+            sliderControl.addTo(map);
+        }
     </script>
     
 </body>

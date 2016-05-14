@@ -22,12 +22,21 @@
           bottom:0;
           width: 100%;
         }
+        #ui-slider {
+            position: absolute;
+            top: 20px;
+            left: 60px;
+        }   
+        
     </style>
 </head>
 <body>
 
     <div id='map'></div>
-
+    <div id="ui-slider">
+         <input type="range" min="1", max="8", value="1", step="1" class="slider">
+    </div>
+    
     <script>
         L.mapbox.accessToken = 'pk.eyJ1Ijoicmdkb25vaHVlIiwiYSI6Im5Ua3F4UzgifQ.PClcVzU5OUj17kuxqsY_Dg';
 
@@ -39,8 +48,82 @@
             maxBounds: L.latLngBounds([-6.22, 27.72],[5.76, 47.83])
         });
         
-        var countyCentroids = omnivore.csv('kenya_education_2014.csv').addTo(map);
+        var currentGrade = 1 
+        var girls,
+            boys;
+        
+        var countyCentroids = omnivore.csv('kenya_education_2014.csv')
+            
+            .on('ready', function(e) {
+                drawMap(e.target.toGeoJSON())
+            })
+            .on('error', function(e) {
+                console.log(e.error[0].message);
+            });
+        
+        function drawMap(schoolData) {
+           girls = L.geoJson(schoolData, {
+                pointToLayer: function(feature, layer){
+                    return L.circleMarker(layer, {
+                        radius: calcRadius(Number(feature.properties.G1)),
+                        color: 'blue',
+                        opacity: 1,
+                        weight: 2,
+                        fillOpacity: 0
+                        });
+                    }
+                }).addTo(map);
 
+           boys = L.geoJson(schoolData, {
+                pointToLayer: function(feature, layer){
+                    return L.circleMarker(layer, {
+                        radius: calcRadius(Number(feature.properties.B1)),
+                        color: 'red',
+                        opacity: 1,
+                        weight: 2,
+                        fillOpacity: 0
+                    });
+                }
+            }).addTo(map);
+            sequenceUI();
+        }
+
+        function calcRadius(val) {
+            var radius = Math.sqrt(val/Math.PI);
+            return radius * .6;
+        }
+        
+        
+        function updateSymbols() {
+            girls.eachLayer(function(layer) {
+                layer.setRadius(calcRadius(Number(layer.feature.properties['G'+String(currentGrade)])));
+                            });
+            
+            boys.eachLayer(function(layer) {
+                layer.setRadius(calcRadius(Number(layer.feature.properties['B'+String(currentGrade)])));
+                            });
+        };
+        
+        
+        function sequenceUI() {
+            $('.slider')
+                .on('input change', function() {
+                    currentGrade = $(this).val();
+                    updateSymbols();
+                    });
+        };
+        
+        
+    
+//        var customLayer = L.geoJson(null, {
+//            
+//            style: function(feature) {
+//                return { color: '#f00'};
+//            }
+//        });
+//        
+//        var runLayer = omnivore.kml('line.kml', null, customLayer)
+        
     </script>
 </body>
 </html>

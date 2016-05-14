@@ -26,7 +26,18 @@
             position: absolute;
             top: 20px;
             left: 60px;
-        }   
+        }
+        #grade {
+            position: absolute;
+            left: 60px;
+            top: 50px;
+            padding: 6px 15px 8px;
+            background: whitesmoke;
+            border: 2px solid #d3d3d3;
+            }
+        #grade span {
+            color: black;
+        }
         
     </style>
 </head>
@@ -36,6 +47,7 @@
     <div id="ui-slider">
          <input type="range" min="1", max="8", value="1", step="1" class="slider">
     </div>
+    <div id='grade'><b>Grade: </b><span>1</span></div>
     
     <script>
         L.mapbox.accessToken = 'pk.eyJ1Ijoicmdkb25vaHVlIiwiYSI6Im5Ua3F4UzgifQ.PClcVzU5OUj17kuxqsY_Dg';
@@ -51,6 +63,7 @@
         var currentGrade = 1 
         var girls,
             boys;
+        
         
         var countyCentroids = omnivore.csv('kenya_education_2014.csv')
             
@@ -106,10 +119,14 @@
         
         
         function sequenceUI() {
+            
+            var output = $('#grade span');
+            
             $('.slider')
                 .on('input change', function() {
                     currentGrade = $(this).val();
                     updateSymbols();
+                    output.html(currentGrade);
                     });
         };
         

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset=utf-8 />
-    <title>A simple map</title>
+    <title>Kenya Student Attrition Rates</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     
     <script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
@@ -13,45 +13,89 @@
     <link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
     <link href='https://fonts.googleapis.com/css?family=Work+Sans:400,500,600' rel='stylesheet' type='text/css'>
     <style>
+/*        color scheme*/
+/*        boys:#004563 Girls: #E83A25 text: #191B28*/
         body {
           margin:0;
           padding:0;
           font-family: "Work Sans", sans-serif;
           color: '#191B28'
         }
+        h1 {
+            color: whitesmoke;
+            background: #004563;
+            margin: 0;
+            padding: 8px 25px 8px 15px;
+        }
+        h2 {
+            margin: 0;
+            padding: 8px 25px 8px 15px;
+            color: #191B28;
+            font-weight: 500;
+            font-size: 1.2em;
+            text-align: left;
+        }
+        h3 {
+            color: whitesmoke;
+            background: #004563;
+        }
         #map {
           position:absolute;
           top:0;
           bottom:0;
-          right:0;
-          width: 67%;
+          left:0;
+          width: 75%;
         }
         #ui-slider {
             position: absolute;
             bottom: 20px;
-            left: 36%;
-            background: #191B28;
-            color: whitesmoke
+            right: 26%;
+            color: #004563;
+            padding: 6px 15px 8px;
+            background: #004563;
+            width: 200px;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
         }
+        .slider {
+            width: 100%;
+            }
         #grade {
             position: absolute;
-            left: 36%;
+            right: 26%;
+            width: 200px;
             bottom: 60px;
             padding: 6px 15px 8px;
-            background: #191B28;
+            background: #004563;
             color: whitesmoke;
-            border: 2px solid #d3d3d3;
+            text-align: center;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
             }
         #grade span {
-            color: black;
+            color: whitesmoke;
         }
         #legend {
             position: absolute;
-            right: 0;
-            bottom:30px;
+            right: 26%;
+            bottom: 100px;
+            padding: 8px 15px;
+            background: #004563;
+            border-radius: 5px; 
+            color: #191B28;   
+            width: 200px;
+            height: 210px;
+        }
+        #legend h3 {
+            text-align: right;
+            font-weight: 500;
+            margin: 10px 0 20px;
+            background: #004563;
         }
         #info {
-            position: absolute; 
+            padding: 8px 15ps;
+            position: absolute;
+            text-align: center;
             max-width: 200px;
             right: 15px;
             top: 15px;
@@ -59,33 +103,75 @@
             background: whitesmoke;
             border: 2px solid #d3d3d3;
             padding: 2px 6px;
+            border-radius: 5px;
         }
 
         #info p {
             margin: 3px 0 4px;
         }
+        .girls {
+            color: #E83A25; 
+        }
+        .boys {
+            color: #004563;
+        }
+        #info span:last-child {
+            font-size: 1.3em;
+            font-weight: 500;
+            color: #191B28;
+        }
         #side-panel {
             position: absolute;
-            left: 0;
+            right: 0;
             top: 0;
             bottom: 0;
-            width: 33%;
-            background: #004563';
+            width: 25%;
+            background: whitesmoke;
+            border-left: 3px solid #004563;
+            overflow-y: scroll;
         }
+        #side-panel p {
+            margin: 8px 0 4px; 
+            padding: 0 25px 0 15px;
+            color: #3d3d3d;
+            text-align: left;
+            font-size: 1em; 
+        }
+        #side-panel p:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+        #side-panel img {
+            float: right;
+            margin: 0 0 15px 15px;
+        }
+        
         
     </style>
 </head>
 <body>
 
     <div id='map'></div>
-    <div id="ui-slider">
-         <input type="range" min="1", max="8", value="1", step="1" class="slider">
+    <div id='side-panel'>
+        <h1>Student Attrition Rates<br/>Kenya</h1>
+        <h2>2014 enrollment rates for boys and girls</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam mollis laoreet elementum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec mi eros, rutrum sed orci eget, venenatis varius est. Pellentesque accumsan est vitae risus malesuada fringilla.</p>
+        <p><img src="images/legend.png" alt="legend"></p>
+        <p>Cras at massa in leo aliquam fermentum. Nunc auctor vestibulum sagittis. Aliquam pulvinar, ipsum in pulvinar tincidunt, enim metus fermentum tellus, quis accumsan ex lorem ut ante. Phasellus fermentum orci eget interdum ultrices. Proin vitae magna id odio ultricies placerat quis id ex. Aenean volutpat volutpat gravida.</p>
+        <h2>About this map</h2>
+        <p>Phasellus in ante nec augue pulvinar pellentesque id vitae nunc. Donec tincidunt metus metus, sed rhoncus ex vehicula sed. Donec erat felis, dignissim bibendum metus ut, tincidunt dictum ligula. Aliquam interdum gravida enim id aliquet. Duis sed ex sed mi aliquam hendrerit. Nunc egestas in lorem ac consectetur. Donec quis rhoncus metus.</p>
+        <h2>About the data</h2>
+        <p>Phasellus in ante nec augue pulvinar pellentesque id vitae nunc. Donec tincidunt metus metus, sed rhoncus ex vehicula sed. Donec erat felis, dignissim bibendum metus ut, tincidunt dictum ligula. Aliquam interdum gravida enim id aliquet. Duis sed ex sed mi aliquam hendrerit. Nunc egestas in lorem ac consectetur. Donec quis rhoncus metus.</p>
     </div>
-    <div id='grade'><b>Grade: </b><span>1</span></div>
     <div id='legend'>
         <h3>2014 Enrollments per County</h3>
         <svg class='legend' width="200" height='200'></svg>
     </div> 
+    <div id="ui-slider">
+         <input type="range" min="1", max="8", value="1", step="1" class="slider">
+    </div>
+    <div id='grade'><b>Grade: </b><span>1</span></div>
     <div id="info">
         <p>County: <span></span></p>
         <p class="girls">girls <span></span>: <span></span></p>
@@ -106,7 +192,7 @@
         var currentGrade = 1 
         var girls,
             boys,
-            scaleFactor = .4
+            scaleFactor = .5
         
         
         var countyCentroids = omnivore.csv('kenya_education_2014.csv')
@@ -119,6 +205,7 @@
             });
         
         function drawMap(schoolData) {
+            
            girls = L.geoJson(schoolData, {
                 pointToLayer: function(feature, layer){
                     return L.circleMarker(layer, {
@@ -143,7 +230,37 @@
                 }
             }).addTo(map);
             sequenceUI();
-            infoWindow()
+            
+            
+            $.getJSON("kenyan-counties.geojson", function(data) {
+            
+            counties = L.geoJson(data, {
+                 style: function(feature) {
+                    return {
+                            weight: 0,
+                            color: '#004563',
+                            fillOpacity: .1,
+                        };
+                }                
+            }).addTo(map);
+            
+            counties.eachLayer(function(layer) {
+                layer.on('mouseover', function(){
+                    layer.setStyle( { 
+                        weight: 0, 
+                        color: '#004563', 
+                        fillOpacity: .2,
+                        } );                    
+                    girls.bringToFront();
+                    boys.bringToFront();
+                });
+            layer.on('mouseout', function() {
+            layer.setStyle( { weight: 0, fillOpacity: .1 }             );  
+                });
+            });
+        });
+        infoWindow();
+        updateSymbols();
         }
 
         function calcRadius(val) {
@@ -203,9 +320,9 @@
 
             for (var circle in circles) {
 
-                svgCircles += '<circle cx="'+ 100 +'" cy="'+ (circles[circle] - 180) * -1 +'" r="'+ circles[circle] +'" stroke="#d3d3d3" stroke-width="1" fill="ghostwhite" />';
+                svgCircles += '<circle cx="'+ 90 +'" cy="'+ (circles[circle] - 115) * -1 +'" r="'+ circles[circle] +'" stroke="#191B28" stroke-width="1" fill="ghostwhite" />';
 
-                svgCircles += '<text x="'+ 80 +'" y = "'+ (circles[circle] - 160) * -1 +'" fill= "green">'+ reverseCalc(circles[circle]) +'</text>'
+                svgCircles += '<text x="'+ 65 +'" y = "'+ (circles[circle] - 84) * -1 +'" fill= "#191B28">'+ reverseCalc(circles[circle]) +'</text>'
             }
 
             legend.html(svgCircles)
@@ -227,13 +344,14 @@
                 $(".girls span:last-child").text(props['G'+String(currentGrade)].toLocaleString());
                 $(".boys span:last-child").text(props['B'+String(currentGrade)].toLocaleString());
                 e.layer.setStyle({ fillOpacity: .3 });
-
-            });
+            
+            
+        });
 
         boys.on('mouseout', function(e) {
             info.hide();
             e.layer.setStyle({ fillOpacity: 0 });
-        });
+        });  
         $(document).mousemove(function(e){
             // offset from mouse position
             info.css({"left": e.pageX + 6, "top": e.pageY - info.height() - 15}); 
@@ -247,7 +365,6 @@
                 info.css({"left": e.pageX - info.width() - 30});
             }
         });
-        
         
     }
     

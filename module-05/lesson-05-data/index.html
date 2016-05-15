@@ -246,6 +246,9 @@
             
             counties.eachLayer(function(layer) {
                 layer.on('mouseover', function(){
+                    var info = $('#info'); 
+                    var props = layer.feature.properties;
+                    info.show();
                     layer.setStyle( { 
                         weight: 0, 
                         color: '#004563', 
@@ -255,6 +258,8 @@
                     boys.bringToFront();
                 });
             layer.on('mouseout', function() {
+            var info = $('#info');
+            info.hide();
             layer.setStyle( { weight: 0, fillOpacity: .1 }             );  
                 });
             });
@@ -344,8 +349,8 @@
                 $(".girls span:last-child").text(props['G'+String(currentGrade)].toLocaleString());
                 $(".boys span:last-child").text(props['B'+String(currentGrade)].toLocaleString());
                 e.layer.setStyle({ fillOpacity: .3 });
-            
-            
+                
+             
         });
 
         boys.on('mouseout', function(e) {

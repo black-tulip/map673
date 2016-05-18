@@ -245,16 +245,18 @@
             }).addTo(map);
             
             counties.eachLayer(function(layer) {
-                layer.on('mouseover', function(){
+                boys.bringToFront();
+                boys.on('mouseover', function(){
+                    var countyName = layer.feature.properties.COUNTY;
+                    counties.COUNTY.setStyle( { weight: 0, fillOpacity: .2 })
                     var info = $('#info'); 
                     var props = layer.feature.properties;
                     info.show();
-                    layer.setStyle( { 
-                        weight: 0, 
-                        color: '#004563', 
-                        fillOpacity: .2,
-                        } );                    
-                    girls.bringToFront();
+//                    layer.setStyle( { 
+//                        weight: 0, 
+//                        color: '#004563', 
+//                        fillOpacity: .2,
+//                        } );                    
                     boys.bringToFront();
                 });
             layer.on('mouseout', function() {

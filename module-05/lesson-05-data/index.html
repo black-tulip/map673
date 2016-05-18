@@ -145,6 +145,7 @@
         #side-panel img {
             float: right;
             margin: 0 0 15px 15px;
+            width: 90%;
         }
         
         
@@ -198,13 +199,26 @@
         var countyCentroids = omnivore.csv('kenya_education_2014.csv')
             
             .on('ready', function(e) {
-                drawMap(e.target.toGeoJSON())
+                $.getJSON("kenya_counties.json", function(data) {
+                    
+                        drawMap(e.target.toGeoJSON(), data)
+                });
             })
             .on('error', function(e) {
                 console.log(e.error[0].message);
             });
         
-        function drawMap(schoolData) {
+        function drawMap(schoolData, geoData) {
+            
+            counties = L.geoJson(geoData, {
+                 style: function(feature) {
+                    return {
+                            weight: 0,
+                            color: '#004563',
+                            fillOpacity: .1,
+                        };
+                }                
+            }).addTo(map);
             
            girls = L.geoJson(schoolData, {
                 pointToLayer: function(feature, layer){
@@ -231,34 +245,40 @@
             }).addTo(map);
             sequenceUI();
             
-            
-            $.getJSON("kenyan-counties.geojson", function(data) {
-            
-            counties = L.geoJson(data, {
-                 style: function(feature) {
-                    return {
-                            weight: 0,
-                            color: '#004563',
-                            fillOpacity: .1,
-                        };
-                }                
-            }).addTo(map);
-            
-            counties.eachLayer(function(layer) {
-                layer.on('mouseover', function(){
-                    layer.setStyle( { 
-                        weight: 0, 
-                        color: '#004563', 
-                        fillOpacity: .2,
-                        } );                    
-                    girls.bringToFront();
-                    boys.bringToFront();
+            // when mousing over a circle
+            boys.on('mouseover', function(e) {
+                
+                //access the props
+                var props = e.layer.feature.properties;
+                
+                // loop through all the counties
+                counties.eachLayer(function(layer) {
+                    
+                    // check and see if that circle and that county
+                    // have the same name
+                    if(props.COUNTY == layer.feature.properties.COUNTY) {
+                        layer.setStyle( { 
+                            weight: 0, 
+                            color: '#004563', 
+                            fillOpacity: .2,
+                            } );
+                    }
+                    
+                    // if so, change the style of the county
+                
                 });
-            layer.on('mouseout', function() {
-            layer.setStyle( { weight: 0, fillOpacity: .1 }             );  
-                });
+                
             });
-        });
+            
+            boys.on('mouseout', function(layer) {
+                
+                 counties.eachLayer(function(layer) {
+                    layer.setStyle( { weight: 0, fillOpacity: .1 } );  
+                 });
+                
+            });
+            
+            
         infoWindow();
         updateSymbols();
         }

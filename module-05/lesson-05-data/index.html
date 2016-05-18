@@ -105,7 +105,6 @@
             padding: 2px 6px;
             border-radius: 5px;
         }
-
         #info p {
             margin: 3px 0 4px;
         }
@@ -145,6 +144,7 @@
         #side-panel img {
             float: right;
             margin: 0 0 15px 15px;
+            width: 90%;
         }
         
         
@@ -180,7 +180,6 @@
     
     <script>
         L.mapbox.accessToken = 'pk.eyJ1Ijoicmdkb25vaHVlIiwiYSI6Im5Ua3F4UzgifQ.PClcVzU5OUj17kuxqsY_Dg';
-
         var map = L.mapbox.map('map', 'mapbox.light', {
             center: [-.23, 37.8],
             zoom: 7,
@@ -198,13 +197,26 @@
         var countyCentroids = omnivore.csv('kenya_education_2014.csv')
             
             .on('ready', function(e) {
-                drawMap(e.target.toGeoJSON())
+                $.getJSON("kenya_counties.json", function(data) {
+                    
+                        drawMap(e.target.toGeoJSON(), data)
+                });
             })
             .on('error', function(e) {
                 console.log(e.error[0].message);
             });
         
-        function drawMap(schoolData) {
+        function drawMap(schoolData, geoData) {
+            
+            counties = L.geoJson(geoData, {
+                 style: function(feature) {
+                    return {
+                            weight: 0,
+                            color: '#004563',
+                            fillOpacity: .1,
+                        };
+                }                
+            }).addTo(map);
             
            girls = L.geoJson(schoolData, {
                 pointToLayer: function(feature, layer){
@@ -217,7 +229,6 @@
                         });
                     }
                 }).addTo(map);
-
            boys = L.geoJson(schoolData, {
                 pointToLayer: function(feature, layer){
                     return L.circleMarker(layer, {
@@ -231,45 +242,43 @@
             }).addTo(map);
             sequenceUI();
             
-            
-            $.getJSON("kenyan-counties.geojson", function(data) {
-            
-            counties = L.geoJson(data, {
-                 style: function(feature) {
-                    return {
-                            weight: 0,
-                            color: '#004563',
-                            fillOpacity: .1,
-                        };
-                }                
-            }).addTo(map);
-            
-            counties.eachLayer(function(layer) {
-                boys.bringToFront();
-                boys.on('mouseover', function(){
-                    var countyName = layer.feature.properties.COUNTY;
-                    counties.COUNTY.setStyle( { weight: 0, fillOpacity: .2 })
-                    var info = $('#info'); 
-                    var props = layer.feature.properties;
-                    info.show();
-//                    layer.setStyle( { 
-//                        weight: 0, 
-//                        color: '#004563', 
-//                        fillOpacity: .2,
-//                        } );                    
-                    boys.bringToFront();
+            // when mousing over a circle
+            boys.on('mouseover', function(e) {
+                
+                //access the props
+                var props = e.layer.feature.properties;
+                
+                // loop through all the counties
+                counties.eachLayer(function(layer) {
+                    
+                    // check and see if that circle and that county
+                    // have the same name
+                    if(props.COUNTY == layer.feature.properties.COUNTY) {
+                        layer.setStyle( { 
+                            weight: 0, 
+                            color: '#004563', 
+                            fillOpacity: .2,
+                            } );
+                    }
+                    
+                    // if so, change the style of the county
+                
                 });
-            layer.on('mouseout', function() {
-            var info = $('#info');
-            info.hide();
-            layer.setStyle( { weight: 0, fillOpacity: .1 }             );  
-                });
+                
             });
-        });
+            
+            boys.on('mouseout', function(layer) {
+                
+                 counties.eachLayer(function(layer) {
+                    layer.setStyle( { weight: 0, fillOpacity: .1 } );  
+                 });
+                
+            });
+            
+            
         infoWindow();
         updateSymbols();
         }
-
         function calcRadius(val) {
             var radius = Math.sqrt(val/Math.PI);
             return radius * scaleFactor;
@@ -324,22 +333,16 @@
             var reverseCalc = function(radius) {
                 return Math.round((Math.pow(radius/scaleFactor, 2) * Math.PI));
             }
-
             for (var circle in circles) {
-
                 svgCircles += '<circle cx="'+ 90 +'" cy="'+ (circles[circle] - 115) * -1 +'" r="'+ circles[circle] +'" stroke="#191B28" stroke-width="1" fill="ghostwhite" />';
-
                 svgCircles += '<text x="'+ 65 +'" y = "'+ (circles[circle] - 84) * -1 +'" fill= "#191B28">'+ reverseCalc(circles[circle]) +'</text>'
             }
-
             legend.html(svgCircles)
             
         }
     
     function infoWindow() {
-
         var info = $('#info');
-
         boys.on('mouseover', function(e) {
             
             var props = e.layer.feature.properties;
@@ -351,10 +354,9 @@
                 $(".girls span:last-child").text(props['G'+String(currentGrade)].toLocaleString());
                 $(".boys span:last-child").text(props['B'+String(currentGrade)].toLocaleString());
                 e.layer.setStyle({ fillOpacity: .3 });
-                
-             
+            
+            
         });
-
         boys.on('mouseout', function(e) {
             info.hide();
             e.layer.setStyle({ fillOpacity: 0 });
@@ -362,7 +364,6 @@
         $(document).mousemove(function(e){
             // offset from mouse position
             info.css({"left": e.pageX + 6, "top": e.pageY - info.height() - 15}); 
-
             // switch right in crash
             if(info.offset().top < 4) {
                 info.css({"top": e.pageY + 15});

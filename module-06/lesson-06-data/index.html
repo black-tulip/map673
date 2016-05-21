@@ -21,6 +21,49 @@
 
     <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
     <script>
+        
+        var url = 'https://nilslewis.cartodb.com/api/v2/viz/299c3e1c-e202-11e5-a61c-0ea31932ec1d/viz.json'
+        
+        cartodb.createVis('map', url)
+            .done(function(vis, layers) {
+
+                console.log(vis, layers);
+                console.log(vis.getLayers()); /// same as layers here
+                console.log(vis.getOverlays()); /// same as layers here
+
+                var sublayer = layers[1]; // reference to the layers
+
+                console.log(layers[1].getSubLayerCount()) // the number of layers
+
+                sublayer.setInteraction(true); // set the interaction true on the layers
+
+                // retrieve specific information from various features of the layers
+                sublayer.on('featureOver', function(e, latlng, pos, data) {
+                    console.log(e, latlng, pos, data);
+                });
+
+                sublayer.setOpacity(.5); // change the opacity of the layers
+
+                sublayer.getSubLayer(2).hide();  // select a specific sublayer of the
+                                                    // layers and hide it
+        });
+        
+        
+        
+        
+        
+//        cartodb.createVis('map', url, {
+//            shareable: false, 
+//            title: true, 
+//            description: false,
+//            search: true, 
+//            zoom: 3,
+//            cartodb_logo: false,
+//            layer_selector: false,
+//            fullscreen: true
+//        })
+//          .done(function(vis, layers) {
+//          });
 
     </script>
 </body>

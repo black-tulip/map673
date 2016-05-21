@@ -20,33 +20,108 @@
     <div id="map"></div>
 
     <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+    <script type="cartocss/html" id="countries-styles">
+        /** choropleth visualization */
+
+        #frajility_1{
+          polygon-fill: #1a9850;
+          polygon-opacity: 0.9;
+          line-color: #d5d9d8;
+          line-width: 0.2;
+          line-opacity: 1;
+        }
+        #frajility_1 [ fragility <= 114.5] {
+           polygon-fill: #d73027;
+        }
+        #frajility_1 [ fragility <= 100.6857142857142] {
+           polygon-fill: #f79272;
+        }
+        #frajility_1 [ fragility <= 86.8714285714285] {
+           polygon-fill: #fed6b0;
+        }
+        #frajility_1 [ fragility <= 73.05714285714281] {
+           polygon-fill: #fff2cc;
+        }
+        #frajility_1 [ fragility <= 59.242857142857105] {
+           polygon-fill: #d2ecb4;
+        }
+        #frajility_1 [ fragility <= 45.4285714285714] {
+           polygon-fill: #8cce8a;
+        }
+        #frajility_1 [ fragility <= 31.6142857142857] {
+           polygon-fill: #1a9850;
+        }
+    </script>
     <script>
         
-        var url = 'https://nilslewis.cartodb.com/api/v2/viz/299c3e1c-e202-11e5-a61c-0ea31932ec1d/viz.json'
         
-        cartodb.createVis('map', url)
-            .done(function(vis, layers) {
-
-                console.log(vis, layers);
-                console.log(vis.getLayers()); /// same as layers here
-                console.log(vis.getOverlays()); /// same as layers here
-
-                var sublayer = layers[1]; // reference to the layers
-
-                console.log(layers[1].getSubLayerCount()) // the number of layers
-
-                sublayer.setInteraction(true); // set the interaction true on the layers
-
-                // retrieve specific information from various features of the layers
-                sublayer.on('featureOver', function(e, latlng, pos, data) {
-                    console.log(e, latlng, pos, data);
-                });
-
-                sublayer.setOpacity(.5); // change the opacity of the layers
-
-                sublayer.getSubLayer(2).hide();  // select a specific sublayer of the
-                                                    // layers and hide it
+        var map = new L.map('map', {
+            center: [13,0],
+            zoom: 3
         });
+//        
+//        var url = 'https://nilslewis.cartodb.com/api/v2/viz/299c3e1c-e202-11e5-a61c-0ea31932ec1d/viz.json';
+//        
+//        var cartoCSS = '#frajility_1{'+
+//                'polygon-fill: steelblue;'+
+//                'polygon-opacity: 0.8;'+
+//                'polygon-comp-op: lighten;'+
+//                'line-color: #FFF;'+
+//                'line-width: 0.2;'+
+//                'line-opacity: 1;'+
+//            '}';
+            
+            
+            
+            
+        var sourceObject = {
+            user_name:'nilslewis',
+            type: 'cartodb',
+            sublayers: [
+                {
+                    sql: "SELECT * FROM frajility_1",
+                    //"SELECT ST_Transform(the_geom, 97291) AS the_geom_webmercator, cartodb_id, fragility FROM frajility_1"
+                    cartocss: $("#countries-styles").text()
+                }
+            ]
+        }
+        
+        cartodb.createLayer(map, sourceObject).addTo(map); //just adds map, not functionality. 
+        
+          
+        
+        
+        
+//        cartodb.createVis('map', url)
+//            .done(function(vis, layers) {
+//                var map = vis.getNativeMap();
+//        });
+
+
+        
+//        cartodb.createVis('map', url)
+//            .done(function(vis, layers) {
+//
+//                console.log(vis, layers);
+//                console.log(vis.getLayers()); 
+//                console.log(vis.getOverlays()); 
+//
+//                var sublayer = layers[1]; 
+//
+//                console.log(layers[1].getSubLayerCount()) 
+//
+//                sublayer.setInteraction(true); 
+//
+//           
+//                sublayer.on('featureOver', function(e, latlng, pos, data) {
+//                    console.log(e, latlng, pos, data);
+//                });
+//
+//                sublayer.setOpacity(.5); 
+//
+//                sublayer.getSubLayer(2).hide();  
+//                                                    
+//        });
         
         
         

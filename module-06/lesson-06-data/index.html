@@ -75,6 +75,7 @@
     </ul>
     </div>
     
+    
 <!--    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/2.0.10/themes/css/cartodb.css" />   -->
     <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
     
@@ -83,9 +84,9 @@
 
         #frajility_1{
           polygon-fill: #1a9850;
-          polygon-opacity: 0.6;
-          line-color: #d5d9d8;
-          line-width: 0.3;
+          polygon-opacity: 1;
+          line-color: darkslategrey;
+          line-width: .3;
           line-opacity: 1;
         }
         #frajility_1 [ fragility <= 114.5] {
@@ -115,7 +116,7 @@
         
         
         var map = new L.map('map', {
-            center: [16,0],
+            center: [18,0],
             zoom: 3,
             zoomControl: false,
             maxZoom: 4,
@@ -126,7 +127,7 @@
 //        var url = 'https://nilslewis.cartodb.com/api/v2/viz/299c3e1c-e202-11e5-a61c-0ea31932ec1d/viz.json';
 //        
 //        var cartoCSS = '#frajility_1{'+
-//                'polygon-fill: steelblue;'+
+//                'polygon-fill: whitesmoke;'+
 //                'polygon-opacity: 1;'+
 //                'polygon-comp-op: lighten;'+
 //                'line-color: #FFF;'+

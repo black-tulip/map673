@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>673 Module 06 CartoDB Starter Template</title>
+    <title>Fragile States Map</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
@@ -12,22 +12,80 @@
         height: 100%;
         padding: 0;
         margin: 0;
+        background-color:darkslategrey
       }
+        h1 {
+            color:darkslategrey;
+            margin: 0;
+            opacity: 1;
+            font-family: sans-serif
+        }
+        #title {
+            position: absolute;
+            top: 0;
+            padding: 8px 15px;
+            background: whitesmoke;
+            opacity: .6;
+            width: 100%;
+            height: 35px;
+        }
+        #footer {
+            position: absolute;
+            bottom: 0;
+            padding: 8px 15px;
+            color: whitesmoke;
+            opacity: .6;
+            width: 100%;
+            height: 30px;
+            font-family: sans-serif;
+            font-weight: bold
+        }
+        #cartodb-legend choropleth {
+            background: whitesmoke;
+            opacity: .6;
+        }
     </style>
 </head>
 <body>
     
     <div id="map"></div>
-
+    <div id="title">
+    <h1 align=center>FRAGILITY BY COUNTRY 2015</h1>
+    </div>
+    <div id='footer'><p align=center>Data from the Fragile States Index published by the Fund for Peace</p></div>
+    <div class='cartodb-legend choropleth'>	
+    <ul>
+        <li class="min">
+            Sustainable
+        </li>
+        <li class="max">
+            Fragile
+        </li>
+        <li class="graph count_441">
+        <div class="colors">
+        <div class="quartile" style="background-color:#1a9850"></div>
+        <div class="quartile" style="background-color:#8cce8a"></div>
+        <div class="quartile" style="background-color:#d2ecb4"></div>
+        <div class="quartile" style="background-color:#fff2cc"></div>
+        <div class="quartile" style="background-color:#fed6b0"></div>
+        <div class="quartile" style="background-color:#f79272"></div>
+        <div class="quartile" style="background-color:#d73027"></div>
+        </div>
+        </li>
+    </ul>
+    </div>
+    
+<!--    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/2.0.10/themes/css/cartodb.css" />   -->
     <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+    
     <script type="cartocss/html" id="countries-styles">
         /** choropleth visualization */
 
         #frajility_1{
           polygon-fill: #1a9850;
-          polygon-opacity: 0.9;
+          polygon-opacity: 0.6;
           line-color: #d5d9d8;
-          line-width: 0.2;
+          line-width: 0.3;
           line-opacity: 1;
         }
         #frajility_1 [ fragility <= 114.5] {
@@ -52,19 +110,24 @@
            polygon-fill: #1a9850;
         }
     </script>
+    
     <script>
         
         
         var map = new L.map('map', {
-            center: [13,0],
-            zoom: 3
+            center: [16,0],
+            zoom: 3,
+            zoomControl: false,
+            maxZoom: 4,
+            minZoom: 3,
+            legends: true
         });
 //        
 //        var url = 'https://nilslewis.cartodb.com/api/v2/viz/299c3e1c-e202-11e5-a61c-0ea31932ec1d/viz.json';
 //        
 //        var cartoCSS = '#frajility_1{'+
 //                'polygon-fill: steelblue;'+
-//                'polygon-opacity: 0.8;'+
+//                'polygon-opacity: 1;'+
 //                'polygon-comp-op: lighten;'+
 //                'line-color: #FFF;'+
 //                'line-width: 0.2;'+
@@ -72,23 +135,28 @@
 //            '}';
             
             
-            
+       var landCartoCSS = '#world_borders{' +
+                    'polygon-fill: grey;' +
+                        
+                    '}'     
             
         var sourceObject = {
             user_name:'nilslewis',
             type: 'cartodb',
             sublayers: [
                 {
+                    sql: "SELECT * FROM world_borders",
+                    cartocss : landCartoCSS
+                },{
                     sql: "SELECT * FROM frajility_1",
                     //"SELECT ST_Transform(the_geom, 97291) AS the_geom_webmercator, cartodb_id, fragility FROM frajility_1"
-                    cartocss: $("#countries-styles").text()
+                    cartocss: $("#countries-styles").text(),
                 }
             ]
         }
-        
         cartodb.createLayer(map, sourceObject).addTo(map); //just adds map, not functionality. 
         
-          
+              
         
         
         

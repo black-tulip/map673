@@ -2,20 +2,108 @@
 <head>
     <meta charset="utf-8">
     <title>Map 673 Lesson 07 Template</title>
-
+        
     <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
     <style>
+        h1, h2 {
+            position: absolute;
+            left: 20px;
+            top: 0px;
+            font-size: 2em;
+            font-weight: 100;
+            color: #005DAA;
+        }
+        h2 {
+            font-size: 1.2em;
+            top: 40px
+        }
         body {
             padding: 0;
             margin: 0;
             background: whitesmoke;
             font-family: Montserrat, sans-serif;
         }
+        #map {
+            width: 900px;
+            height: 600px;
+            border: 1px solid #d3d3d3;
+            padding: 20px 80px
+        }
+        .county {
+            stroke: #fff;
+            fill:#005DAA;
+        }
+        
+        .hover {
+            fill: yellow;
+        }
+        .land {
+            fill:#d3d3d3;
+        }
     </style>
 </head>
 <body>
+    
+    <body>
+    <h1>US Counties</h1>
+    <h2> </h2>
+    <div id='map'></div>   
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+        
+    <script src='us-counties-topo.json'></script>
+        
   
 <script>
+    
+    var width = 900, height = 600;
+    
+    var svg = d3.select('#map')
+    .append( 'svg')
+    .attr( 'width', width)
+    .attr( 'height', height);
+    
+    var projection = d3.geo.albersUsa()
+        .scale(1000)
+        .translate([width / 2, height / 2]);
+    
+    var geoPath = d3.geo.path()
+        .projection(projection);
+    
+    queue()
+        .defer(d3.json, 'us-counties-topo.json')
+        .defer(d3.json, "na_land_clipped.json")
+        .await(makeMap);
+    
+    function makeMap(error, counties, na){
+        svg.append('g')
+            .selectAll('path')
+            .data(na.features)
+            .enter()
+            .append("path")
+            .attr("d", geoPath)
+            .attr("class", "land")
+            .data( topojson.feature(counties, counties.objects.counties).features)     
+            .enter()
+            .append('path')
+            .attr( 'd', geoPath )
+            .attr('class', 'county')
+            .on('mouseover', function(d){
+                d3.select('h2').text(d.properties.NAME + ' county');
+                d3.select(this).attr('class', 'county hover');
+            
+            
+            })
+            .on('mouseout', function(d){
+                d3.select('h2').text('');
+                d3.select(this).attr('class', 'county');
+            });
+        }
+
+    
+        
+    
         
    // custom JS goes here
  

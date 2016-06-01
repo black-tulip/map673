@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fragile States Map</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+    
+    <style>
+      html, body, #map {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        background-color:darkslategrey
+      }
+        h1 {
+            color:darkslategrey;
+            margin: 0;
+            opacity: 1;
+            font-family: sans-serif
+        }
+        #title {
+            position: absolute;
+            top: 0;
+            padding: 8px 15px;
+            background: whitesmoke;
+            opacity: .7;
+            width: 100%;
+            height: 35px;
+        }
+        #footer {
+            position: absolute;
+            bottom: 0;
+            padding: 8px 15px;
+            color: whitesmoke;
+            opacity: .6;
+            width: 100%;
+            height: 30px;
+            font-family: sans-serif;
+            font-weight: bold
+        }
+        #cartodb-legend choropleth {
+            background: whitesmoke;
+            opacity: .6;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="map"></div>
+    <div id="title">
+    <h1 align=center>FRAGILE COUNTRIES 2015</h1>
+    </div>
+    <div id='footer'><p align=center>Data from the Fragile States Index published by the Fund for Peace</p></div>
+    <div class='cartodb-legend choropleth'>	
+    <ul>
+        <li class="min">
+            Sustainable
+        </li>
+        <li class="max">
+            Fragile
+        </li>
+        <li class="graph count_441">
+        <div class="colors">
+        <div class="quartile" style="background-color:#1a9850"></div>
+        <div class="quartile" style="background-color:#8cce8a"></div>
+        <div class="quartile" style="background-color:#d2ecb4"></div>
+        <div class="quartile" style="background-color:#fff2cc"></div>
+        <div class="quartile" style="background-color:#fed6b0"></div>
+        <div class="quartile" style="background-color:#f79272"></div>
+        <div class="quartile" style="background-color:#d73027"></div>
+        </div>
+        </li>
+    </ul>
+    </div>
+    
+    
+<!--    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/2.0.10/themes/css/cartodb.css" />   -->
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+    
+    <script type="cartocss/html" id="countries-styles">
+        /** choropleth visualization */
+
+        #frajility_1{
+          polygon-fill: #1a9850;
+          polygon-opacity: 1;
+          line-color: darkslategrey;
+          line-width: .3;
+          line-opacity: 1;
+        }
+        #frajility_1 [ fragility <= 114.5] {
+           polygon-fill: #d73027;
+        }
+        #frajility_1 [ fragility <= 100.6857142857142] {
+           polygon-fill: #f79272;
+        }
+        #frajility_1 [ fragility <= 86.8714285714285] {
+           polygon-fill: #fed6b0;
+        }
+        #frajility_1 [ fragility <= 73.05714285714281] {
+           polygon-fill: #fff2cc;
+        }
+        #frajility_1 [ fragility <= 59.242857142857105] {
+           polygon-fill: #d2ecb4;
+        }
+        #frajility_1 [ fragility <= 45.4285714285714] {
+           polygon-fill: #8cce8a;
+        }
+        #frajility_1 [ fragility <= 31.6142857142857] {
+           polygon-fill: #1a9850;
+        }
+    </script>
+    
+    <script>
+        
+        
+        var map = new L.map('map', {
+            center: [18,0],
+            zoom: 3,
+            zoomControl: false,
+            maxZoom: 4,
+            minZoom: 3,
+        });
+//        
+//        var url = 'https://nilslewis.cartodb.com/api/v2/viz/299c3e1c-e202-11e5-a61c-0ea31932ec1d/viz.json';
+//        
+//        var cartoCSS = '#frajility_1{'+
+//                'polygon-fill: whitesmoke;'+
+//                'polygon-opacity: 1;'+
+//                'polygon-comp-op: lighten;'+
+//                'line-color: #FFF;'+
+//                'line-width: 0.2;'+
+//                'line-opacity: 1;'+
+//            '}';
+            
+            
+       var landCartoCSS = '#world_borders{' +
+                    'polygon-fill: grey;' +
+                        
+                    '}'     
+            
+        var sourceObject = {
+            user_name:'nilslewis',
+            type: 'cartodb',
+            sublayers: [
+                {
+                    sql: "SELECT * FROM world_borders",
+                    cartocss : landCartoCSS
+                },{
+                    sql: "SELECT * FROM frajility_1",
+                    //"SELECT ST_Transform(the_geom, 97291) AS the_geom_webmercator, cartodb_id, fragility FROM frajility_1"
+                    cartocss: $("#countries-styles").text(),
+                }
+            ]
+        }
+        cartodb.createLayer(map, sourceObject).addTo(map); //just adds map, not functionality. 
+        
+              
+        
+        
+        
+//        cartodb.createVis('map', url)
+//            .done(function(vis, layers) {
+//                var map = vis.getNativeMap();
+//        });
+
+
+        
+//        cartodb.createVis('map', url)
+//            .done(function(vis, layers) {
+//
+//                console.log(vis, layers);
+//                console.log(vis.getLayers()); 
+//                console.log(vis.getOverlays()); 
+//
+//                var sublayer = layers[1]; 
+//
+//                console.log(layers[1].getSubLayerCount()) 
+//
+//                sublayer.setInteraction(true); 
+//
+//           
+//                sublayer.on('featureOver', function(e, latlng, pos, data) {
+//                    console.log(e, latlng, pos, data);
+//                });
+//
+//                sublayer.setOpacity(.5); 
+//
+//                sublayer.getSubLayer(2).hide();  
+//                                                    
+//        });
+        
+        
+        
+        
+        
+//        cartodb.createVis('map', url, {
+//            shareable: false, 
+//            title: true, 
+//            description: false,
+//            search: true, 
+//            zoom: 3,
+//            cartodb_logo: false,
+//            layer_selector: false,
+//            fullscreen: true
+//        })
+//          .done(function(vis, layers) {
+//          });
+
+    </script>
+</body>
+</html>

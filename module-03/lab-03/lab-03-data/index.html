@@ -61,7 +61,7 @@
             width: 180px;
         }
         .legend h3 {
-            font-size: 1.5em;
+            font-size: 1.3em;
             font-weight: bold;
             color: #001323;
             text-align: center;
@@ -72,7 +72,7 @@
             width: 20px;
             height: 20px;
             float: left;
-            margin: 0 10px 10px 0;
+            margin: 0 10px 0 0;
         }
         .legend ul {
             list-style-type: none;
@@ -125,7 +125,7 @@
             zoom: 8,
             minZoom: 7,
             maxZoom: 9,
-            dragging: false,
+            dragging: true,
             zoomControl: true
         }
         
@@ -304,9 +304,9 @@
             
                     var color = getColor(breaks[i + 1], breaks);
                     
-                    $('.legend ul').append('<br><span style="background:' + color + '"></span> ' +
+                    $('.legend ul').append('<li><span style="background:' + color + '"></span> ' +
                         breaks[i] + '%' +' &mdash; ' +
-                        breaks[i + 1] + '%' + '<br>');
+                        breaks[i + 1] + '%' + '</li>');
                 }
             legend.append("</ul>");
             
